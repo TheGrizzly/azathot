@@ -6,15 +6,25 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//BienController with the handler methods relevant to the router
-type PlayerController interface {
+//StatusController with the handler methods relevant to the router
+type StatusController interface {
 	Healthz(w http.ResponseWriter, req *http.Request)
 }
 
+//UserController with the handler methods relevant to the router
+type UserController interface {
+	Login(w http.ResponseWriter, req *http.Request)
+	Signup(w http.ResponseWriter, req *http.Request)
+}
+
 //create a new Router
-func GetRouter(pc PlayerController) *mux.Router {
+func GetRouter(sc StatusController, uc UserController) *mux.Router {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/healthz", pc.Healthz).Methods("GET").Name("healthz")
+	r.HandleFunc("/healthz", sc.Healthz).Methods("GET").Name("healthz")
+
+	r.HandleFunc("/login", uc.Login).Methods("GET").Name("login")
+	r.HandleFunc("/signup", uc.Signup).Methods("GET").Name("signup")
+
 	return r
 }

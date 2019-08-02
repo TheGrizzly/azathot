@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/unrolled/render"
 )
 
@@ -14,4 +16,14 @@ func NewUser(r *render.Render) *User {
 	return &User{
 		render: r,
 	}
+}
+
+// Login handler func
+func (c *User) Login(w http.ResponseWriter, req *http.Request) {
+	c.render.Text(w, http.StatusOK, "Entering ...")
+}
+
+// Signup handler func
+func (c *User) Signup(w http.ResponseWriter, req *http.Request) {
+	c.render.Text(w, http.StatusOK, "Creating user...")
 }
