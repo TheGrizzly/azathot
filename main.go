@@ -14,11 +14,10 @@ import (
 func main() {
 	renderer := render.New()
 
-	playerController := controller.NewPlayer(renderer)
 	userController := controller.NewUser(renderer)
-	charactersController := controller.NewCharacer(renderer)
+	statusController := controller.NewStatus(renderer)
 
-	router := router.GetRouter(playerController)
+	router := router.GetRouter(statusController, userController)
 	log.Println("Starting API server in port 1937")
 	log.Fatal(http.ListenAndServe(":1937", handlers.CORS(
 		handlers.AllowedHeaders(
