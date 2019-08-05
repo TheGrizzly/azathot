@@ -4,8 +4,10 @@ import (
 	"log"
 	"net/http"
 
+	"azathot/config"
 	"azathot/controller"
 	"azathot/router"
+	"azathot/service/database"
 
 	"github.com/gorilla/handlers"
 	"github.com/unrolled/render"
@@ -15,8 +17,25 @@ func main() {
 	renderer := render.New()
 
 	userController := controller.NewUser(renderer)
-	statusController := controller.NewStatus(renderer)
+	appConfig, err := config.LoadFromConfigFile()
+	if err != nil {
+		log.Fatal("error retreiving configuration: ", err)
+	}
 
+	db, err := database.New(appConfig)
+	if err != nil {
+		log.Fatal("error creating db service")
+	}
+
+	healthChecker := controller.HealthChecker{
+		db,
+	}
+
+	if err = healthChecker.IsHealthy(); err != nil {
+		log.Fatal("error checking deps of healthiness: ", err)
+	}
+
+	statusController := controller.NewStatus(renderer, healthChecker)
 	router := router.GetRouter(statusController, userController)
 	log.Println("Starting API server in port 1937")
 	log.Fatal(http.ListenAndServe(":1937", handlers.CORS(
