@@ -4,6 +4,8 @@ import (
 	"azathot/config"
 	"database/sql"
 	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // Service for database calls
