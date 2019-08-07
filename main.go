@@ -7,7 +7,9 @@ import (
 	"azathot/config"
 	"azathot/controller"
 	"azathot/router"
+	"azathot/service/crypt"
 	"azathot/service/database"
+	"azathot/usecase"
 
 	"github.com/gorilla/handlers"
 	"github.com/unrolled/render"
@@ -16,7 +18,6 @@ import (
 func main() {
 	renderer := render.New()
 
-	userController := controller.NewUser(renderer)
 	appConfig, err := config.LoadFromConfigFile()
 	if err != nil {
 		log.Fatal("error retreiving configuration: ", err)
@@ -35,6 +36,11 @@ func main() {
 		log.Fatal("error checking deps of healthiness: ", err)
 	}
 
+	cryptService := crypt.New(appConfig)
+
+	userUsecase := usecase.NewUser(db, cryptService)
+
+	userController := controller.NewUser(userUsecase, renderer)
 	statusController := controller.NewStatus(renderer, healthChecker)
 	router := router.GetRouter(statusController, userController)
 	log.Println("Starting API server in port 1937")

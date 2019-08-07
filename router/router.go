@@ -23,8 +23,8 @@ func GetRouter(sc StatusController, uc UserController) *mux.Router {
 
 	r.HandleFunc("/healthz", sc.Healthz).Methods("GET").Name("healthz")
 
-	r.HandleFunc("/login", uc.Login).Methods("GET").Name("login")
-	r.HandleFunc("/signup", uc.Signup).Methods("GET").Name("signup")
+	r.HandleFunc("/login", uc.Login).Methods("POST").Name("login")
+	r.HandleFunc("/signup", uc.Signup).Methods("POST").Name("signup")
 
 	return r
 }

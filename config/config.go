@@ -15,6 +15,7 @@ type App struct {
 	DBPassword string `json:"db_password"`
 	DBHost     string `json:"db_host"`
 	DBPort     string `json:"db_port"`
+	CryptCost  int    `json:"crypt_cost"`
 }
 
 const (
