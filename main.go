@@ -9,6 +9,7 @@ import (
 	"azathot/router"
 	"azathot/service/crypt"
 	"azathot/service/database"
+	"azathot/service/jwt"
 	"azathot/usecase"
 
 	"github.com/gorilla/handlers"
@@ -37,8 +38,9 @@ func main() {
 	}
 
 	cryptService := crypt.New(appConfig)
+	jwtService := jwt.New(appConfig)
 
-	userUsecase := usecase.NewUser(db, cryptService)
+	userUsecase := usecase.NewUser(db, cryptService, jwtService)
 
 	userController := controller.NewUser(userUsecase, renderer)
 	statusController := controller.NewStatus(renderer, healthChecker)

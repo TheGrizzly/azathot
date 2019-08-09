@@ -13,6 +13,7 @@ import (
 // UserUsecase interface
 type UserUsecase interface {
 	Signup(params *model.UserParams) *model.Response
+	Login(params *model.UserParams) *model.Response
 }
 
 //users controller struct
@@ -31,7 +32,16 @@ func NewUser(u UserUsecase, r *render.Render) *User {
 
 // Login handler func
 func (c *User) Login(w http.ResponseWriter, req *http.Request) {
-	c.render.Text(w, http.StatusOK, "Entering ...")
+	params, err := getUserParams(req)
+	if err != nil {
+		log.Println("error parsin login params:", err.Error())
+		c.render.Text(w, http.StatusInternalServerError, cons.UnexpectedServerError)
+
+		return
+	}
+
+	resp := c.usecase.Login(params)
+	c.render.JSON(w, resp.Code, resp.Message)
 }
 
 // Signup handler func

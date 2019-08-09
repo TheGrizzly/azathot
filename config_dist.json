@@ -6,5 +6,7 @@
     "db_name": "",
     "db_host": "",
     "db_port": "",
-    "crypt_cost": ""
+    "crypt_cost": "",
+    "jwt_key": "",
+    "jwt_expiration": ""
 }

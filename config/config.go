@@ -9,13 +9,15 @@ import (
 
 //App struct to be used globally
 type App struct {
-	DBDriver   string `json:"db_driver"`
-	DBName     string `json:"db_name"`
-	DBUser     string `json:"db_user"`
-	DBPassword string `json:"db_password"`
-	DBHost     string `json:"db_host"`
-	DBPort     string `json:"db_port"`
-	CryptCost  int    `json:"crypt_cost"`
+	DBDriver      string `json:"db_driver"`
+	DBName        string `json:"db_name"`
+	DBUser        string `json:"db_user"`
+	DBPassword    string `json:"db_password"`
+	DBHost        string `json:"db_host"`
+	DBPort        string `json:"db_port"`
+	CryptCost     int    `json:"crypt_cost"`
+	JWTKey        string `json:"jwt_key"`
+	JWTExpiration string `json:"jwt_expiration"`
 }
 
 const (
