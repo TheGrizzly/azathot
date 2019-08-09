@@ -18,9 +18,9 @@ const (
 	`
 	insertUserQuery = `
 		INSERT INTO
-			users (email, password)
+			users (email, password, is_admin)
 		VALUES
-			(?, ?)
+			(?, ?, false)
 	`
 )
 
@@ -36,7 +36,13 @@ type User struct {
 func (s *Service) GetUserByEmail(email string) (*model.User, error) {
 	var dbUser User
 
-	err := s.db.QueryRow(getUserByEmailQuery, email).Scan(&dbUser.ID, &dbUser.Email, &dbUser.Password, &dbUser.IsAdmin, &dbUser.IdPlayer)
+	err := s.db.QueryRow(getUserByEmailQuery, email).Scan(
+		&dbUser.ID,
+		&dbUser.Email,
+		&dbUser.Password,
+		&dbUser.IsAdmin,
+		&dbUser.IdPlayer,
+	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
