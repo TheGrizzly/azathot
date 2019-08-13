@@ -2,20 +2,20 @@ package database
 
 import (
 	"azathot/config"
-	"database/sql"
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	sqlx "github.com/jmoiron/sqlx"
 )
 
 // Service for database calls
 type Service struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
 // New database service struct
 func New(ac *config.App) (*Service, error) {
-	db, err := sql.Open(ac.DBDriver, fmt.Sprintf(
+	db, err := sqlx.Open(ac.DBDriver, fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s",
 		ac.DBUser,
 		ac.DBPassword,
