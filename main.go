@@ -41,10 +41,12 @@ func main() {
 	jwtService := jwt.New(appConfig)
 
 	userUsecase := usecase.NewUser(db, cryptService, jwtService)
+	playerUsecase := usecase.NewPlayer(db)
 
 	userController := controller.NewUser(userUsecase, renderer)
 	statusController := controller.NewStatus(renderer, healthChecker)
-	router := router.GetRouter(statusController, userController)
+	playerController := controller.NewPlayer(playerUsecase, renderer)
+	router := router.GetRouter(statusController, userController, playerController)
 	log.Println("Starting API server in port 1937")
 	log.Fatal(http.ListenAndServe(":1937", handlers.CORS(
 		handlers.AllowedHeaders(

@@ -6,4 +6,5 @@ const (
 	UserRegisteredMessage    = "user registered succesfully"
 	InvalidCredentialMessage = "invalid credentials"
 	LoginSucessfulMessage    = "login succesful"
+	PlayersNotFoundMessage   = "players not found"
 )
