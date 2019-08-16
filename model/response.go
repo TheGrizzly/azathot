@@ -11,3 +11,7 @@ type LoginResponse struct {
 	Message string `json:"message"`
 	Token   string `json:"token"`
 }
+
+type PlayersResponse struct {
+	Players []*Player `json:"players"`
+}

@@ -17,14 +17,20 @@ type UserController interface {
 	Signup(w http.ResponseWriter, req *http.Request)
 }
 
+type PlayerUsecase interface {
+	GetPlayers(w http.ResponseWriter, req *http.Request)
+}
+
 //create a new Router
-func GetRouter(sc StatusController, uc UserController) *mux.Router {
+func GetRouter(sc StatusController, uc UserController, pc PlayerUsecase) *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/healthz", sc.Healthz).Methods("GET").Name("healthz")
 
-	r.HandleFunc("/login", uc.Login).Methods("POST").Name("login")
-	r.HandleFunc("/signup", uc.Signup).Methods("POST").Name("signup")
+	r.HandleFunc("/login", uc.Login).Methods("GET").Name("login")
+	r.HandleFunc("/signup", uc.Signup).Methods("GET").Name("signup")
+
+	r.HandleFunc("/players", pc.GetPlayers).Methods("GET").Name("players")
 
 	return r
 }
