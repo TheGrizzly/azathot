@@ -3,6 +3,7 @@ package model
 // PlayerParams
 type PlayerParams struct {
 	Region int `json:"region"`
+	ID     int `json:"id"`
 }
 
 // Player model

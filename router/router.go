@@ -19,6 +19,7 @@ type UserController interface {
 
 type PlayerUsecase interface {
 	GetPlayers(w http.ResponseWriter, req *http.Request)
+	GetPlayer(w http.ResponseWriter, req *http.Request)
 }
 
 //create a new Router
@@ -30,7 +31,8 @@ func GetRouter(sc StatusController, uc UserController, pc PlayerUsecase) *mux.Ro
 	r.HandleFunc("/login", uc.Login).Methods("GET").Name("login")
 	r.HandleFunc("/signup", uc.Signup).Methods("GET").Name("signup")
 
-	r.HandleFunc("/players", pc.GetPlayers).Methods("GET").Name("players")
+	r.HandleFunc("/players", pc.GetPlayers).Methods("GET").Name("getPlayers")
+	r.HandleFunc("/players/{player_id}", pc.GetPlayer).Methods("GET").Name("getPlayer")
 
 	return r
 }

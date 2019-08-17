@@ -13,5 +13,6 @@ type LoginResponse struct {
 }
 
 type PlayersResponse struct {
-	Players []*Player `json:"players"`
+	Player  *Player   `json:"player,omitempty"`
+	Players []*Player `json:"players,omitempty"`
 }

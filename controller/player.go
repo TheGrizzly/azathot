@@ -6,13 +6,16 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/unrolled/render"
 )
 
 //Player usecase interface
 type PlayerUsecase interface {
 	GetPlayers(params *model.PlayerParams) *model.Response
+	GetPlayer(params *model.PlayerParams) *model.Response
 }
 
 //Players control struct
@@ -33,7 +36,7 @@ func NewPlayer(u PlayerUsecase, r *render.Render) *Player {
 func (c *Player) GetPlayers(w http.ResponseWriter, req *http.Request) {
 	params, err := getPlayerParams(req)
 	if err != nil {
-		log.Println("error parsing getPlayer params: ", err.Error())
+		log.Println("error parsing getPlayer params: ", err)
 		c.render.Text(w, http.StatusInternalServerError, cons.UnexpectedServerError)
 
 		return
@@ -43,13 +46,46 @@ func (c *Player) GetPlayers(w http.ResponseWriter, req *http.Request) {
 	c.render.JSON(w, resp.Code, resp.Message)
 }
 
-func getPlayerParams(req *http.Request) (*model.PlayerParams, error) {
-	var params model.PlayerParams
-
-	err := json.NewDecoder(req.Body).Decode(&params)
+func (c *Player) GetPlayer(w http.ResponseWriter, req *http.Request) {
+	params, err := getPlayerParams(req)
 	if err != nil {
-		return nil, err
+		log.Println("error parsing getPlayer params: ", err)
+		c.render.Text(w, http.StatusInternalServerError, cons.UnexpectedServerError)
+
+		return
 	}
 
-	return &params, nil
+	resp := c.usecase.GetPlayer(params)
+	c.render.JSON(w, resp.Code, resp.Message)
+}
+
+func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
+	var queryParams model.PlayerParams
+	pathParams := mux.Vars(req)
+
+	var playerID int
+	var err error
+
+	if pathParams["player_id"] != "" {
+		playerID, err = strconv.Atoi(pathParams["player_id"])
+		if err != nil {
+			return nil, &model.Response{
+				Code:    http.StatusBadRequest,
+				Message: cons.InvalidPlayerIDMessage,
+			}
+		}
+	}
+
+	err = json.NewDecoder(req.Body).Decode(&queryParams)
+	if err != nil {
+		return nil, &model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: cons.UnexpectedServerError,
+		}
+	}
+
+	return &model.PlayerParams{
+		ID:     playerID,
+		Region: queryParams.Region,
+	}, nil
 }
