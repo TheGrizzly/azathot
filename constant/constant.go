@@ -7,4 +7,6 @@ const (
 	InvalidCredentialMessage = "invalid credentials"
 	LoginSucessfulMessage    = "login succesful"
 	PlayersNotFoundMessage   = "players not found"
+	PlayerNotFoundMessage    = "player not found"
+	InvalidPlayerIDMessage   = "player id must be an integer"
 )

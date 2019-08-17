@@ -17,8 +17,14 @@ const (
 			id_region
 		FROM
 			players
-		WHERE
-			id_region = ?
+	`
+
+	getPlayersByRegionQuery = getPlayersQuery + `
+		WHERE id_region = ?
+	`
+
+	getPlayerByIdQuery = getPlayersQuery + `
+		WHERE id = ?
 	`
 )
 
@@ -37,7 +43,7 @@ type Players []Player
 func (s *Service) GetPlayers(IdRegion int) ([]*model.Player, error) {
 	var dbPlayers Players
 
-	rows, err := s.db.Query(getPlayersQuery, IdRegion)
+	rows, err := s.db.Query(getPlayersByRegionQuery, IdRegion)
 	if err != nil {
 		return nil, err
 	}
@@ -69,19 +75,46 @@ func (s *Service) GetPlayers(IdRegion int) ([]*model.Player, error) {
 	return dbPlayers.ToModel(), nil
 }
 
+func (s *Service) GetPlayerById(id int) (*model.Player, error) {
+	var dbPlayer Player
+
+	err := s.db.QueryRow(getPlayerByIdQuery, id).Scan(
+		&dbPlayer.ID,
+		&dbPlayer.Name,
+		&dbPlayer.Tag,
+		&dbPlayer.IdMain,
+		&dbPlayer.SmashggUser,
+		&dbPlayer.NumColor,
+		&dbPlayer.IdRegion,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return dbPlayer.toModel(), err
+}
+
+func (p Player) toModel() *model.Player {
+	return &model.Player{
+		ID:          p.ID.Int64,
+		Name:        p.Name.String,
+		Tag:         p.Tag.String,
+		IdMain:      p.IdMain.Int64,
+		SmashggUser: p.SmashggUser.String,
+		NumColor:    p.NumColor.Int64,
+		IdRegion:    p.IdRegion.Int64,
+	}
+}
+
 func (p Players) ToModel() []*model.Player {
 	mPlayers := []*model.Player{}
 
 	for n := range p {
-		mPlayers = append(mPlayers, &model.Player{
-			ID:          p[n].ID.Int64,
-			Name:        p[n].Name.String,
-			Tag:         p[n].Tag.String,
-			IdMain:      p[n].IdMain.Int64,
-			SmashggUser: p[n].SmashggUser.String,
-			NumColor:    p[n].NumColor.Int64,
-			IdRegion:    p[n].IdRegion.Int64,
-		})
+		mPlayers = append(mPlayers, p[n].toModel())
 	}
 
 	return mPlayers
