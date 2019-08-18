@@ -9,4 +9,5 @@ const (
 	PlayersNotFoundMessage   = "players not found"
 	PlayerNotFoundMessage    = "player not found"
 	InvalidPlayerIDMessage   = "player id must be an integer"
+	InvalidTokenMessage      = "invalid token"
 )

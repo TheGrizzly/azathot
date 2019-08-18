@@ -17,7 +17,7 @@ type App struct {
 	DBPort        string `json:"db_port"`
 	CryptCost     int    `json:"crypt_cost"`
 	JWTKey        string `json:"jwt_key"`
-	JWTExpiration string `json:"jwt_expiration"`
+	JWTExpiration int    `json:"jwt_expiration"`
 }
 
 const (
