@@ -17,22 +17,28 @@ type UserController interface {
 	Signup(w http.ResponseWriter, req *http.Request)
 }
 
-type PlayerUsecase interface {
+type PlayerController interface {
 	GetPlayers(w http.ResponseWriter, req *http.Request)
 	GetPlayer(w http.ResponseWriter, req *http.Request)
+	PostPlayer(w http.ResponseWriter, req *http.Request)
+}
+
+type JWTMiddelware interface {
+	ValidateJWT(handler http.HandlerFunc) http.HandlerFunc
 }
 
 //create a new Router
-func GetRouter(sc StatusController, uc UserController, pc PlayerUsecase) *mux.Router {
+func GetRouter(sc StatusController, uc UserController, pc PlayerController, jm JWTMiddelware) *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/healthz", sc.Healthz).Methods("GET").Name("healthz")
 
-	r.HandleFunc("/login", uc.Login).Methods("GET").Name("login")
-	r.HandleFunc("/signup", uc.Signup).Methods("GET").Name("signup")
+	r.HandleFunc("/login", uc.Login).Methods("POST").Name("login")
+	r.HandleFunc("/signup", uc.Signup).Methods("POST").Name("signup")
 
 	r.HandleFunc("/players", pc.GetPlayers).Methods("GET").Name("getPlayers")
 	r.HandleFunc("/players/{player_id}", pc.GetPlayer).Methods("GET").Name("getPlayer")
+	r.HandleFunc("/players", jm.ValidateJWT(pc.PostPlayer)).Methods("POST").Name("postProucts")
 
 	return r
 }

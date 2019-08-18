@@ -59,6 +59,10 @@ func (c *Player) GetPlayer(w http.ResponseWriter, req *http.Request) {
 	c.render.JSON(w, resp.Code, resp.Message)
 }
 
+func (c *Player) PostPlayer(w http.ResponseWriter, req *http.Request) {
+	c.render.Text(w, http.StatusOK, "mugging")
+}
+
 func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
 	var queryParams model.PlayerParams
 	pathParams := mux.Vars(req)

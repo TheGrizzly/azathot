@@ -1,6 +1,7 @@
 package main
 
 import (
+	"azathot/middleware"
 	"log"
 	"net/http"
 
@@ -40,13 +41,15 @@ func main() {
 	cryptService := crypt.New(appConfig)
 	jwtService := jwt.New(appConfig)
 
+	jwtMiddleware := middleware.New(jwtService, renderer)
+
 	userUsecase := usecase.NewUser(db, cryptService, jwtService)
 	playerUsecase := usecase.NewPlayer(db)
 
 	userController := controller.NewUser(userUsecase, renderer)
 	statusController := controller.NewStatus(renderer, healthChecker)
 	playerController := controller.NewPlayer(playerUsecase, renderer)
-	router := router.GetRouter(statusController, userController, playerController)
+	router := router.GetRouter(statusController, userController, playerController, jwtMiddleware)
 	log.Println("Starting API server in port 1937")
 	log.Fatal(http.ListenAndServe(":1937", handlers.CORS(
 		handlers.AllowedHeaders(

@@ -35,3 +35,23 @@ func (s *Service) Generate(email string, isAdmin bool) (string, error) {
 
 	return token.SignedString(s.key)
 }
+
+func (s *Service) Validate(etoken string) bool {
+	if etoken == "" {
+		return false
+	}
+
+	token, err := jwtgo.Parse(etoken, func(token *jwtgo.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwtgo.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("error parsing token")
+		}
+
+		return s.key, nil
+	})
+	if err != nil || !token.Valid {
+		return false
+	}
+
+	claims := token.Claims.(jwtgo.MapClaims)
+	return claims["isAdmin"] == true
+}
