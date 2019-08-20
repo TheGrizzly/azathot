@@ -2,17 +2,18 @@ package model
 
 // PlayerParams
 type PlayerParams struct {
-	Region int `json:"region"`
-	ID     int `json:"id"`
+	Region    int     `json:"region"`
+	ID        int     `json:"id"`
+	NewPlayer *Player `json:"player"`
 }
 
 // Player model
 type Player struct {
-	ID          int64
-	Name        string
-	Tag         string
-	IdMain      int64
-	SmashggUser string
-	NumColor    int64
-	IdRegion    int64
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Tag         string `json:"tag"`
+	IdMain      int64  `json:"id_main"`
+	SmashggUser string `json:"smashgg_user"`
+	NumColor    int64  `json:"num_color"`
+	IdRegion    int64  `json:"id_region"`
 }
