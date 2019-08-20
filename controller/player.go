@@ -16,6 +16,7 @@ import (
 type PlayerUsecase interface {
 	GetPlayers(params *model.PlayerParams) *model.Response
 	GetPlayer(params *model.PlayerParams) *model.Response
+	PostPlayer(params *model.PlayerParams) *model.Response
 }
 
 //Players control struct
@@ -60,7 +61,16 @@ func (c *Player) GetPlayer(w http.ResponseWriter, req *http.Request) {
 }
 
 func (c *Player) PostPlayer(w http.ResponseWriter, req *http.Request) {
-	c.render.Text(w, http.StatusOK, "mugging")
+	params, err := getPlayerParams(req)
+	if err != nil {
+		log.Println("error parsing getPlayer params: ", err)
+		c.render.Text(w, http.StatusInternalServerError, cons.UnexpectedServerError)
+
+		return
+	}
+
+	resp := c.usecase.PostPlayer(params)
+	c.render.JSON(w, resp.Code, resp.Message)
 }
 
 func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
@@ -89,7 +99,8 @@ func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
 	}
 
 	return &model.PlayerParams{
-		ID:     playerID,
-		Region: queryParams.Region,
+		ID:        playerID,
+		Region:    queryParams.Region,
+		NewPlayer: queryParams.NewPlayer,
 	}, nil
 }

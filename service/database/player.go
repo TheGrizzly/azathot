@@ -26,6 +26,17 @@ const (
 	getPlayerByIdQuery = getPlayersQuery + `
 		WHERE id = ?
 	`
+
+	getPlayerByNameQuery = getPlayersQuery + `
+		WHERE name = ?
+	`
+
+	insertPlayerQuery = `
+		INSERT INTO
+			players (name, tag, id_main, smashgg_user, num_color, id_region)
+		VALUES
+			(?, ?, ?, ?, ?, ?)
+	`
 )
 
 type Player struct {
@@ -40,6 +51,7 @@ type Player struct {
 
 type Players []Player
 
+//GetPlayerByRegion
 func (s *Service) GetPlayers(IdRegion int) ([]*model.Player, error) {
 	var dbPlayers Players
 
@@ -75,6 +87,7 @@ func (s *Service) GetPlayers(IdRegion int) ([]*model.Player, error) {
 	return dbPlayers.ToModel(), nil
 }
 
+//GetPlayerById
 func (s *Service) GetPlayerById(id int) (*model.Player, error) {
 	var dbPlayer Player
 
@@ -96,6 +109,45 @@ func (s *Service) GetPlayerById(id int) (*model.Player, error) {
 	}
 
 	return dbPlayer.toModel(), err
+}
+
+//GetPlayerByName
+func (s *Service) GetPlayerByName(name string) (*model.Player, error) {
+	var dbPlayer Player
+	err := s.db.QueryRow(getPlayerByNameQuery, name).Scan(
+		&dbPlayer.ID,
+		&dbPlayer.Name,
+		&dbPlayer.Tag,
+		&dbPlayer.IdMain,
+		&dbPlayer.SmashggUser,
+		&dbPlayer.NumColor,
+		&dbPlayer.IdRegion,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return dbPlayer.toModel(), err
+}
+
+//InsertPlayer
+func (s *Service) InsertPlayer(p *model.Player) error {
+	stmt, err := s.db.Prepare(insertPlayerQuery)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(p.Name, p.Tag, p.IdMain, p.SmashggUser, p.NumColor, p.IdRegion)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (p Player) toModel() *model.Player {

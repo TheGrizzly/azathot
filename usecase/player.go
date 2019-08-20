@@ -9,8 +9,10 @@ import (
 
 //PlayerDatabase Interface
 type PlayerDatabase interface {
-	GetPlayers(int) ([]*model.Player, error)
-	GetPlayerById(int) (*model.Player, error)
+	GetPlayers(IdRegion int) ([]*model.Player, error)
+	GetPlayerById(id int) (*model.Player, error)
+	GetPlayerByName(name string) (*model.Player, error)
+	InsertPlayer(p *model.Player) error
 }
 
 //Player usecase
@@ -66,6 +68,59 @@ func (u *Player) GetPlayer(params *model.PlayerParams) *model.Response {
 	if player == nil {
 		return &model.Response{
 			Code:    http.StatusNotFound,
+			Message: cons.PlayerNotFoundMessage,
+		}
+	}
+
+	return &model.Response{
+		Code: http.StatusOK,
+		Message: model.PlayersResponse{
+			Player: player,
+		},
+	}
+}
+
+func (u *Player) PostPlayer(params *model.PlayerParams) *model.Response {
+	player, err := u.db.GetPlayerByName(params.NewPlayer.Name)
+	if err != nil {
+		log.Println("error getting product by name:", err.Error())
+
+		return &model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: cons.UnexpectedServerError,
+		}
+	}
+
+	if player != nil {
+		return &model.Response{
+			Code:    http.StatusBadRequest,
+			Message: cons.PlayerAlreadyExistsMessage,
+		}
+	}
+
+	err = u.db.InsertPlayer(params.NewPlayer)
+	if err != nil {
+		log.Println("error inserting user:", err.Error())
+
+		return &model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: cons.UnexpectedServerError,
+		}
+	}
+
+	player, err = u.db.GetPlayerByName(params.NewPlayer.Name)
+	if err != nil {
+		log.Println("error getting product by name:", err.Error())
+
+		return &model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: cons.UnexpectedServerError,
+		}
+	}
+
+	if player == nil {
+		return &model.Response{
+			Code:    http.StatusBadRequest,
 			Message: cons.PlayerNotFoundMessage,
 		}
 	}
