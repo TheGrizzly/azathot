@@ -17,6 +17,7 @@ type PlayerUsecase interface {
 	GetPlayers(params *model.PlayerParams) *model.Response
 	GetPlayer(params *model.PlayerParams) *model.Response
 	PostPlayer(params *model.PlayerParams) *model.Response
+	PatchPlayer(params *model.PlayerParams) *model.Response
 }
 
 //Players control struct
@@ -73,6 +74,19 @@ func (c *Player) PostPlayer(w http.ResponseWriter, req *http.Request) {
 	c.render.JSON(w, resp.Code, resp.Message)
 }
 
+func (c *Player) PatchPlayer(w http.ResponseWriter, req *http.Request) {
+	params, err := getPlayerParams(req)
+	if err != nil {
+		log.Println("error parsing patchPlayer params: ", err)
+		c.render.Text(w, http.StatusInternalServerError, cons.UnexpectedServerError)
+
+		return
+	}
+
+	resp := c.usecase.PatchPlayer(params)
+	c.render.JSON(w, resp.Code, resp.Message)
+}
+
 func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
 	var queryParams model.PlayerParams
 	pathParams := mux.Vars(req)
@@ -101,6 +115,6 @@ func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
 	return &model.PlayerParams{
 		ID:        playerID,
 		Region:    queryParams.Region,
-		NewPlayer: queryParams.NewPlayer,
+		ReqPlayer: queryParams.ReqPlayer,
 	}, nil
 }

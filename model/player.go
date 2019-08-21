@@ -4,7 +4,7 @@ package model
 type PlayerParams struct {
 	Region    int     `json:"region"`
 	ID        int     `json:"id"`
-	NewPlayer *Player `json:"player"`
+	ReqPlayer *Player `json:"player"`
 }
 
 // Player model

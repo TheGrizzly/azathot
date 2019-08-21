@@ -13,6 +13,7 @@ type PlayerDatabase interface {
 	GetPlayerById(id int) (*model.Player, error)
 	GetPlayerByName(name string) (*model.Player, error)
 	InsertPlayer(p *model.Player) error
+	PatchPlayer(p *model.Player) error
 }
 
 //Player usecase
@@ -53,7 +54,6 @@ func (u *Player) GetPlayers(params *model.PlayerParams) *model.Response {
 }
 
 //GetPlayersByID func
-
 func (u *Player) GetPlayer(params *model.PlayerParams) *model.Response {
 	player, err := u.db.GetPlayerById(params.ID)
 	if err != nil {
@@ -80,8 +80,9 @@ func (u *Player) GetPlayer(params *model.PlayerParams) *model.Response {
 	}
 }
 
+//PostPlayer func
 func (u *Player) PostPlayer(params *model.PlayerParams) *model.Response {
-	player, err := u.db.GetPlayerByName(params.NewPlayer.Name)
+	player, err := u.db.GetPlayerByName(params.ReqPlayer.Name)
 	if err != nil {
 		log.Println("error getting product by name:", err.Error())
 
@@ -98,7 +99,7 @@ func (u *Player) PostPlayer(params *model.PlayerParams) *model.Response {
 		}
 	}
 
-	err = u.db.InsertPlayer(params.NewPlayer)
+	err = u.db.InsertPlayer(params.ReqPlayer)
 	if err != nil {
 		log.Println("error inserting user:", err.Error())
 
@@ -108,9 +109,63 @@ func (u *Player) PostPlayer(params *model.PlayerParams) *model.Response {
 		}
 	}
 
-	player, err = u.db.GetPlayerByName(params.NewPlayer.Name)
+	player, err = u.db.GetPlayerByName(params.ReqPlayer.Name)
 	if err != nil {
 		log.Println("error getting product by name:", err.Error())
+
+		return &model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: cons.UnexpectedServerError,
+		}
+	}
+
+	if player == nil {
+		return &model.Response{
+			Code:    http.StatusBadRequest,
+			Message: cons.PlayerNotFoundMessage,
+		}
+	}
+
+	return &model.Response{
+		Code: http.StatusOK,
+		Message: model.PlayersResponse{
+			Player: player,
+		},
+	}
+}
+
+//PatchPlayer func
+func (u *Player) PatchPlayer(params *model.PlayerParams) *model.Response {
+	player, err := u.db.GetPlayerById(params.ID)
+	if err != nil {
+		log.Println("error getting player by id: ", err.Error())
+
+		return &model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: cons.UnexpectedServerError,
+		}
+	}
+
+	if player == nil {
+		return &model.Response{
+			Code:    http.StatusBadRequest,
+			Message: cons.PlayerNotFoundMessage,
+		}
+	}
+
+	err = u.db.PatchPlayer(params.ReqPlayer)
+	if err != nil {
+		log.Println("error patching player: ", err.Error())
+
+		return &model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: cons.UnexpectedServerError,
+		}
+	}
+
+	player, err = u.db.GetPlayerById(params.ID)
+	if err != nil {
+		log.Println("error getting player by id: ", err.Error())
 
 		return &model.Response{
 			Code:    http.StatusInternalServerError,
