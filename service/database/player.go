@@ -37,6 +37,12 @@ const (
 		VALUES
 			(?, ?, ?, ?, ?, ?)
 	`
+
+	patchPlayerQuery = `
+		UPDATE players
+		SET name = ?, tag = ?, id_main = ?, smashgg_user = ?, num_color = ?, id_region = ?
+		WHERE id = ?
+	`
 )
 
 type Player struct {
@@ -143,6 +149,22 @@ func (s *Service) InsertPlayer(p *model.Player) error {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(p.Name, p.Tag, p.IdMain, p.SmashggUser, p.NumColor, p.IdRegion)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+//PatchPlayer
+func (s *Service) PatchPlayer(p *model.Player) error {
+	stmt, err := s.db.Prepare(patchPlayerQuery)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(p.Name, p.Tag, p.IdMain, p.SmashggUser, p.NumColor, p.IdRegion, p.ID)
 	if err != nil {
 		return err
 	}
