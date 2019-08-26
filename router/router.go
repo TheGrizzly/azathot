@@ -22,6 +22,7 @@ type PlayerController interface {
 	GetPlayer(w http.ResponseWriter, req *http.Request)
 	PostPlayer(w http.ResponseWriter, req *http.Request)
 	PatchPlayer(w http.ResponseWriter, req *http.Request)
+	DeletePlayerById(w http.ResponseWriter, req *http.Request)
 }
 
 type JWTMiddelware interface {
@@ -41,6 +42,7 @@ func GetRouter(sc StatusController, uc UserController, pc PlayerController, jm J
 	r.HandleFunc("/players/{player_id}", pc.GetPlayer).Methods("GET").Name("getPlayer")
 	r.HandleFunc("/players", jm.ValidateJWT(pc.PostPlayer)).Methods("POST").Name("postPlayers")
 	r.HandleFunc("/players/{player_id}", jm.ValidateJWT(pc.PatchPlayer)).Methods("PATCH").Name("patchPlayers")
+	r.HandleFunc("/players/{player_id}", jm.ValidateJWT(pc.DeletePlayerById)).Methods("DELETE").Name("deletePlayer")
 
 	return r
 }

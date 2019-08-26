@@ -14,6 +14,7 @@ type PlayerDatabase interface {
 	GetPlayerByName(name string) (*model.Player, error)
 	InsertPlayer(p *model.Player) error
 	PatchPlayer(p *model.Player) error
+	DeletePlayerById(id int) error
 }
 
 //Player usecase
@@ -185,5 +186,39 @@ func (u *Player) PatchPlayer(params *model.PlayerParams) *model.Response {
 		Message: model.PlayersResponse{
 			Player: player,
 		},
+	}
+}
+
+func (u *Player) DeletePlayerById(params *model.PlayerParams) *model.Response {
+	player, err := u.db.GetPlayerById(params.ID)
+	if err != nil {
+		log.Println("error getting player by id: ", err.Error())
+
+		return &model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: cons.UnexpectedServerError,
+		}
+	}
+
+	if player == nil {
+		return &model.Response{
+			Code:    http.StatusBadRequest,
+			Message: cons.PlayerNotFoundMessage,
+		}
+	}
+
+	err = u.db.DeletePlayerById(params.ID)
+	if err != nil {
+		log.Println("error deleting player: ", err.Error())
+
+		return &model.Response{
+			Code:    http.StatusInternalServerError,
+			Message: cons.UnexpectedServerError,
+		}
+	}
+
+	return &model.Response{
+		Code:    http.StatusOK,
+		Message: cons.PlayerDeletedMessage,
 	}
 }
