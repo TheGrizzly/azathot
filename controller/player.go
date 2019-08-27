@@ -4,6 +4,7 @@ import (
 	cons "azathot/constant"
 	"azathot/model"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -18,6 +19,7 @@ type PlayerUsecase interface {
 	GetPlayer(params *model.PlayerParams) *model.Response
 	PostPlayer(params *model.PlayerParams) *model.Response
 	PatchPlayer(params *model.PlayerParams) *model.Response
+	DeletePlayerById(params *model.PlayerParams) *model.Response
 }
 
 //Players control struct
@@ -87,6 +89,19 @@ func (c *Player) PatchPlayer(w http.ResponseWriter, req *http.Request) {
 	c.render.JSON(w, resp.Code, resp.Message)
 }
 
+func (c *Player) DeletePlayerById(w http.ResponseWriter, req *http.Request) {
+	params, err := getPlayerParams(req)
+	if err != nil {
+		log.Println("error parsing deletePlayer params: ", err)
+		c.render.Text(w, http.StatusInternalServerError, cons.UnexpectedServerError)
+
+		return
+	}
+
+	resp := c.usecase.DeletePlayerById(params)
+	c.render.JSON(w, resp.Code, resp.Message)
+}
+
 func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
 	var queryParams model.PlayerParams
 	pathParams := mux.Vars(req)
@@ -97,6 +112,7 @@ func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
 	if pathParams["player_id"] != "" {
 		playerID, err = strconv.Atoi(pathParams["player_id"])
 		if err != nil {
+
 			return nil, &model.Response{
 				Code:    http.StatusBadRequest,
 				Message: cons.InvalidPlayerIDMessage,
@@ -105,7 +121,9 @@ func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
 	}
 
 	err = json.NewDecoder(req.Body).Decode(&queryParams)
-	if err != nil {
+	if err != nil && err != io.EOF {
+		log.Println("error pasing", err.Error())
+
 		return nil, &model.Response{
 			Code:    http.StatusInternalServerError,
 			Message: cons.UnexpectedServerError,

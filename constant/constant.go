@@ -11,4 +11,5 @@ const (
 	InvalidPlayerIDMessage     = "player id must be an integer"
 	InvalidTokenMessage        = "invalid token"
 	PlayerAlreadyExistsMessage = "player already exists"
+	PlayerDeletedMessage       = "player deleted succesfully"
 )
