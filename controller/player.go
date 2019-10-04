@@ -4,7 +4,6 @@ import (
 	cons "azathot/constant"
 	"azathot/model"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -103,7 +102,6 @@ func (c *Player) DeletePlayerById(w http.ResponseWriter, req *http.Request) {
 }
 
 func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
-	var queryParams model.PlayerParams
 	pathParams := mux.Vars(req)
 
 	var playerID int
@@ -120,19 +118,22 @@ func getPlayerParams(req *http.Request) (*model.PlayerParams, *model.Response) {
 		}
 	}
 
-	err = json.NewDecoder(req.Body).Decode(&queryParams)
-	if err != nil && err != io.EOF {
-		log.Println("error pasing", err.Error())
+	var reqPlayer model.Player
 
-		return nil, &model.Response{
-			Code:    http.StatusInternalServerError,
-			Message: cons.UnexpectedServerError,
+	if req.Method == "POST" || req.Method == "PATCH" {
+		err = json.NewDecoder(req.Body).Decode(&reqPlayer)
+		if err != nil {
+			log.Println("error pasing", err.Error())
+
+			return nil, &model.Response{
+				Code:    http.StatusInternalServerError,
+				Message: cons.UnexpectedServerError,
+			}
 		}
 	}
 
 	return &model.PlayerParams{
 		ID:        playerID,
-		Region:    queryParams.Region,
-		ReqPlayer: queryParams.ReqPlayer,
+		ReqPlayer: &reqPlayer,
 	}, nil
 }

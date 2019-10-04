@@ -65,10 +65,10 @@ type Player struct {
 type Players []Player
 
 //GetPlayerByRegion
-func (s *Service) GetPlayers(IdRegion int) ([]*model.Player, error) {
+func (s *Service) GetPlayers() ([]*model.Player, error) {
 	var dbPlayers Players
 
-	rows, err := s.db.Query(getPlayersByRegionQuery, IdRegion)
+	rows, err := s.db.Query(getPlayersQuery)
 	if err != nil {
 		return nil, err
 	}

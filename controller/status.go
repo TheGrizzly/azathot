@@ -21,7 +21,10 @@ type Status struct {
 
 //NewStatus controller
 func NewStatus(r *render.Render, h HealthChecker) *Status {
-	return &Status{render: r}
+	return &Status{
+		healther: h,
+		render:   r,
+	}
 }
 
 // Healthz checks external dependencies status

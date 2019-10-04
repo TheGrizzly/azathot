@@ -9,7 +9,7 @@ import (
 
 //PlayerDatabase Interface
 type PlayerDatabase interface {
-	GetPlayers(IdRegion int) ([]*model.Player, error)
+	GetPlayers() ([]*model.Player, error)
 	GetPlayerById(id int) (*model.Player, error)
 	GetPlayerByName(name string) (*model.Player, error)
 	InsertPlayer(p *model.Player) error
@@ -29,7 +29,7 @@ func NewPlayer(db PlayerDatabase) *Player {
 
 // Get players by region func
 func (u *Player) GetPlayers(params *model.PlayerParams) *model.Response {
-	players, err := u.db.GetPlayers(params.Region)
+	players, err := u.db.GetPlayers()
 	if err != nil {
 		log.Println("error getting players: ", err.Error())
 

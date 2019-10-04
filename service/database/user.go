@@ -8,13 +8,13 @@ import (
 const (
 	getUserByEmailQuery = `
 		SELECT
-			id,
-			email,
-			password,
-			is_admin,
-			id_player
-		FROM users
-		WHERE email = ?
+			u.id,
+			u.email,
+			u.password,
+			u.is_admin,
+			(SELECT p.id_player FROM player_pivot AS p WHERE p.id_user = u.id) as id_player
+		FROM users as u
+		WHERE u.email = ?
 	`
 	insertUserQuery = `
 		INSERT INTO

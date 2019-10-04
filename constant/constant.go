@@ -12,4 +12,5 @@ const (
 	InvalidTokenMessage        = "invalid token"
 	PlayerAlreadyExistsMessage = "player already exists"
 	PlayerDeletedMessage       = "player deleted succesfully"
+	InvalidPlayerMessage       = "player is not correct in the params"
 )

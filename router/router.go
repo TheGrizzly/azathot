@@ -40,9 +40,9 @@ func GetRouter(sc StatusController, uc UserController, pc PlayerController, jm J
 
 	r.HandleFunc("/players", pc.GetPlayers).Methods("GET").Name("getPlayers")
 	r.HandleFunc("/players/{player_id}", pc.GetPlayer).Methods("GET").Name("getPlayer")
-	r.HandleFunc("/players", jm.ValidateJWT(pc.PostPlayer)).Methods("POST").Name("postPlayers")
-	r.HandleFunc("/players/{player_id}", jm.ValidateJWT(pc.PatchPlayer)).Methods("PATCH").Name("patchPlayers")
-	r.HandleFunc("/players/{player_id}", jm.ValidateJWT(pc.DeletePlayerById)).Methods("DELETE").Name("deletePlayer")
+	r.HandleFunc("/admin/players", jm.ValidateJWT(pc.PostPlayer)).Methods("POST").Name("postPlayers")
+	r.HandleFunc("/admin/players/{player_id}", jm.ValidateJWT(pc.PatchPlayer)).Methods("PATCH").Name("patchPlayers")
+	r.HandleFunc("/admin/players/{player_id}", jm.ValidateJWT(pc.DeletePlayerById)).Methods("DELETE").Name("deletePlayer")
 
 	return r
 }
